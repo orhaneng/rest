@@ -1,6 +1,7 @@
 package com.example.api;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -17,6 +18,7 @@ public class ExampleResource {
     public String getExample(@PathParam("param") String param) {
         return "Received parameter: " + param;
     }
+
     @GET
     @Path("/query")
     public String getExample2(@QueryParam("param") String param) {
@@ -41,6 +43,7 @@ public class ExampleResource {
                 .entity(responseMessage)
                 .build();
     }
+
     @GET
     @Path("/return")
     @Produces(MediaType.APPLICATION_JSON)
@@ -60,7 +63,9 @@ public class ExampleResource {
         data = newValue;
         return "Value updated: " + data;
     }
-    static  int num = 1;
+
+    static int num = 1;
+
     @GET
     @Path("/paging")
     @Produces(MediaType.APPLICATION_JSON)
@@ -70,7 +75,7 @@ public class ExampleResource {
         // Simulating data retrieval
         int totalRecords = 100;
         int totalPages = (int) Math.ceil((double) totalRecords / limit);
-        num *=2;
+        num *= 2;
         // Simulating data based on the limit and current page
         int currentPage = num;
         int startRecord = (currentPage - 1) * limit + 1;
@@ -86,7 +91,42 @@ public class ExampleResource {
 
         return response;
     }
+
+    @GET
+    @Path("/cache/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getExample(@PathParam("id") int id) {
+        // Simulate retrieving data based on the provided ID
+        ExampleData data = retrieveData(id);
+
+        if (data != null) {
+            // Build the response with data and cache control settings
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(3600); // Cache for 1 hour
+
+            return Response.ok(data)
+                    .cacheControl(cacheControl)
+                    .build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Data not found")
+                    .build();
+        }
+    }
+
+    private ExampleData retrieveData(int id) {
+        // Simulated data retrieval
+        // Replace with your actual data retrieval logic
+        if (id == 1) {
+            return new ExampleData(1, "Example 1");
+        } else if (id == 2) {
+            return new ExampleData(2, "Example 2");
+        } else {
+            return null;
+        }
+    }
 }
+
 
 /*
     /*
